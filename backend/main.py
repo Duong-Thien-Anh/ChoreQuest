@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import delete, select
+from fastapi.responses import RedirectResponse
 
 from backend.config import settings
 from backend.database import init_db, async_session
@@ -190,7 +191,7 @@ app.include_router(announcements.router)
 app.include_router(pets.router)
 
 
-@app.get("/api/health")
+@app.get("/api/health" , methods=["GET", "HEAD"])
 async def health():
     return {"status": "ok"}
 
