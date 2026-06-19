@@ -891,14 +891,20 @@ async def complete_chore(
         max_size = settings.MAX_UPLOAD_SIZE_MB * 1024 * 1024
         if len(contents) > max_size:
             raise HTTPException(status_code=400, detail=f"File too large. Max {settings.MAX_UPLOAD_SIZE_MB}MB")
-        upload_dir = "/app/data/uploads"
-        os.makedirs(upload_dir, exist_ok=True)
-        ext = os.path.splitext(file.filename or "photo.jpg")[1] or ".jpg"
-        filename = f"{uuid.uuid4().hex}{ext}"
-        filepath = os.path.join(upload_dir, filename)
-        with open(filepath, "wb") as f:
-            f.write(contents)
-        assignment.photo_proof_path = filename
+        import cloudinary
+        import cloudinary.uploader
+        import io
+        cloudinary.config(
+            cloud_name=settings.CLOUDINARY_CLOUD_NAME,
+            api_key=settings.CLOUDINARY_API_KEY,
+            api_secret=settings.CLOUDINARY_API_SECRET,
+        )
+        result = cloudinary.uploader.upload(
+            io.BytesIO(contents),
+            folder="chorequest/uploads",
+            resource_type="image",
+        )
+        assignment.photo_proof_path = result["secure_url"]
 
     assignment.status = AssignmentStatus.completed
     assignment.completed_at = now

@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     REGISTER_RATE_LIMIT_MAX: int = 5
     CORS_ORIGINS: str = ""
     MAX_UPLOAD_SIZE_MB: int = 5
+    CLOUDINARY_CLOUD_NAME: str = ""
+    CLOUDINARY_API_KEY: str = ""
+    CLOUDINARY_API_SECRET: str = ""
     DAILY_RESET_HOUR: int = 0
     TZ: str = "Europe/London"
     VAPID_PRIVATE_KEY: str = ""
