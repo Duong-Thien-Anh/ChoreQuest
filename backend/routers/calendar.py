@@ -46,7 +46,7 @@ async def get_weekly_calendar(
         today = date.today()
         week_start = today - timedelta(days=today.weekday())
     elif week_start.weekday() != 0:
-        raise HTTPException(status_code=400, detail="week_start must be a Monday")
+        week_start = week_start - timedelta(days=week_start.weekday())
 
     week_end = week_start + timedelta(days=6)
 
