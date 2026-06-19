@@ -191,7 +191,7 @@ app.include_router(announcements.router)
 app.include_router(pets.router)
 
 
-@app.get("/api/health" , methods=["GET", "HEAD"])
+@app.api_route("/api/health", methods=["GET", "HEAD"])
 async def health():
     return {"status": "ok"}
 
