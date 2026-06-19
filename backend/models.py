@@ -1,5 +1,5 @@
 import enum
-from datetime import datetime, date
+from datetime import datetime, timezone
 from sqlalchemy import (
     Integer, String, Text, Boolean, Float, Date, DateTime, Enum, JSON,
     ForeignKey, UniqueConstraint,
@@ -109,7 +109,7 @@ class RefreshToken(Base):
     token_hash: Mapped[str] = mapped_column(String, nullable=False)
     is_revoked: Mapped[bool] = mapped_column(Boolean, default=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = relationship("User", back_populates="refresh_tokens")
 
@@ -131,8 +131,8 @@ class User(Base):
     streak_freeze_month: Mapped[int | None] = mapped_column(Integer, nullable=True)
     avatar_config: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow)
 
     refresh_tokens = relationship("RefreshToken", back_populates="user")
     achievements = relationship("UserAchievement", back_populates="user")
@@ -146,7 +146,7 @@ class ChoreCategory(Base):
     icon: Mapped[str] = mapped_column(String(50), nullable=False)
     colour: Mapped[str] = mapped_column(String(7), nullable=False)
     is_default: Mapped[bool] = mapped_column(Boolean, default=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 class Chore(Base):
@@ -163,8 +163,8 @@ class Chore(Base):
     requires_photo: Mapped[bool] = mapped_column(Boolean, default=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_by: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow)
 
     category = relationship("ChoreCategory")
     creator = relationship("User", foreign_keys=[created_by])
@@ -184,8 +184,8 @@ class ChoreAssignment(Base):
     verified_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     photo_proof_path: Mapped[str | None] = mapped_column(String, nullable=True)
     feedback: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow)
 
     chore = relationship("Chore", back_populates="assignments")
     user = relationship("User", foreign_keys=[user_id])
@@ -200,8 +200,8 @@ class ChoreRotation(Base):
     cadence: Mapped[RotationCadence] = mapped_column(Enum(RotationCadence), nullable=False)
     current_index: Mapped[int] = mapped_column(Integer, default=0)
     last_rotated: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow)
 
     chore = relationship("Chore")
 
@@ -215,7 +215,7 @@ class ChoreExclusion(Base):
     chore_id: Mapped[int] = mapped_column(ForeignKey("chores.id"), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     date: Mapped[date] = mapped_column(Date, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 class ChoreAssignmentRule(Base):
@@ -229,8 +229,8 @@ class ChoreAssignmentRule(Base):
     custom_days: Mapped[list | None] = mapped_column(JSON, nullable=True)
     requires_photo: Mapped[bool] = mapped_column(Boolean, default=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow)
 
     chore = relationship("Chore")
     user = relationship("User")
@@ -260,8 +260,8 @@ class Reward(Base):
     auto_approve_threshold: Mapped[int | None] = mapped_column(Integer, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_by: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow)
 
     creator = relationship("User", foreign_keys=[created_by])
 
@@ -277,7 +277,7 @@ class RewardRedemption(Base):
     approved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     fulfilled_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     fulfilled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     reward = relationship("Reward")
     user = relationship("User", foreign_keys=[user_id])
@@ -294,7 +294,7 @@ class PointTransaction(Base):
     description: Mapped[str] = mapped_column(String(500), nullable=False)
     reference_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = relationship("User", foreign_keys=[user_id])
 
@@ -311,7 +311,7 @@ class Achievement(Base):
     tier: Mapped[str | None] = mapped_column(String(10), nullable=True)
     group_key: Mapped[str | None] = mapped_column(String(50), nullable=True)
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 class UserAchievement(Base):
@@ -320,7 +320,7 @@ class UserAchievement(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     achievement_id: Mapped[int] = mapped_column(ForeignKey("achievements.id"), nullable=False)
-    unlocked_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    unlocked_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = relationship("User", back_populates="achievements")
     achievement = relationship("Achievement")
@@ -335,8 +335,8 @@ class WishlistItem(Base):
     image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     converted_to_reward_id: Mapped[int | None] = mapped_column(ForeignKey("rewards.id"), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow)
 
     user = relationship("User")
     reward = relationship("Reward")
@@ -352,7 +352,7 @@ class SeasonalEvent(Base):
     end_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_by: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     creator = relationship("User")
 
@@ -367,7 +367,7 @@ class Notification(Base):
     is_read: Mapped[bool] = mapped_column(Boolean, default=False)
     reference_type: Mapped[str | None] = mapped_column(String(50), nullable=True)
     reference_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = relationship("User", back_populates="notifications")
 
@@ -379,7 +379,7 @@ class SpinResult(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     points_won: Mapped[int] = mapped_column(Integer, nullable=False)
     spin_date: Mapped[date] = mapped_column(Date, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = relationship("User")
 
@@ -394,7 +394,7 @@ class ApiKey(Base):
     created_by: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     last_used_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     creator = relationship("User")
 
@@ -406,7 +406,7 @@ class AuditLog(Base):
     action: Mapped[str] = mapped_column(String(100), nullable=False)
     details: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     ip_address: Mapped[str | None] = mapped_column(String(45), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 class PushSubscription(Base):
@@ -417,7 +417,7 @@ class PushSubscription(Base):
     endpoint: Mapped[str] = mapped_column(Text, nullable=False)
     p256dh: Mapped[str] = mapped_column(Text, nullable=False)
     auth: Mapped[str] = mapped_column(Text, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = relationship("User")
 
@@ -426,7 +426,7 @@ class AppSetting(Base):
     __tablename__ = "app_settings"
     key: Mapped[str] = mapped_column(String(100), primary_key=True)
     value: Mapped[str] = mapped_column(Text, nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=datetime.utcnow)
 
 
 class InviteCode(Base):
@@ -438,7 +438,7 @@ class InviteCode(Base):
     times_used: Mapped[int] = mapped_column(Integer, default=0)
     created_by: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     creator = relationship("User")
 
@@ -455,7 +455,7 @@ class AvatarItem(Base):
     unlock_method: Mapped[AvatarUnlockMethod] = mapped_column(Enum(AvatarUnlockMethod), nullable=False)
     unlock_value: Mapped[int | None] = mapped_column(Integer, nullable=True)
     is_default: Mapped[bool] = mapped_column(Boolean, default=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 class UserAvatarItem(Base):
@@ -466,7 +466,7 @@ class UserAvatarItem(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     avatar_item_id: Mapped[int] = mapped_column(ForeignKey("avatar_items.id"), nullable=False)
     acquired_via: Mapped[AvatarAcquiredVia] = mapped_column(Enum(AvatarAcquiredVia), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = relationship("User")
     avatar_item = relationship("AvatarItem")
@@ -480,7 +480,7 @@ class Shoutout(Base):
     to_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     message: Mapped[str] = mapped_column(String(200), nullable=False)
     emoji: Mapped[str] = mapped_column(String(10), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     from_user = relationship("User", foreign_keys=[from_user_id])
     to_user = relationship("User", foreign_keys=[to_user_id])
@@ -495,7 +495,7 @@ class Announcement(Base):
     icon: Mapped[str | None] = mapped_column(String(50), nullable=True)
     is_pinned: Mapped[bool] = mapped_column(Boolean, default=False)
     created_by: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     creator = relationship("User")
 
@@ -508,6 +508,6 @@ class VacationPeriod(Base):
     end_date: Mapped[date] = mapped_column(Date, nullable=False)
     created_by: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     creator = relationship("User")
