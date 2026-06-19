@@ -214,7 +214,7 @@ async def list_chores(
                     ChoreAssignmentRule.chore_id == Chore.id,
                     ChoreAssignmentRule.is_active == True,
                 ),
-            ).distinct()
+            ).distinct(Chore.id)
 
         result = await db.execute(query)
         chores = result.scalars().all()
@@ -252,7 +252,7 @@ async def list_chores(
                 ChoreAssignment.user_id == user.id,
             )
             .options(selectinload(Chore.category))
-            .distinct()
+            .distinct(Chore.id)
         )
         chores = result.scalars().all()
 
