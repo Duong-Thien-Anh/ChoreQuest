@@ -325,7 +325,7 @@ export default function ParentDashboard() {
                   {assignment.photo_proof_path && (
                     <div className="mt-2">
                       <img
-                        src={`/api/uploads/${assignment.photo_proof_path}`}
+                        src={assignment.photo_proof_path.startsWith("http") ? assignment.photo_proof_path : `/api/uploads/${assignment.photo_proof_path}`}
                         alt="Photo proof"
                         className="rounded-md max-h-48 object-cover border border-border"
                       />

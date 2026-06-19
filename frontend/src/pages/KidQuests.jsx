@@ -254,7 +254,7 @@ export default function KidQuests() {
                 {a.photo_proof_path && isCompleted && (
                   <div className="mt-3">
                     <img
-                      src={`/api/uploads/${a.photo_proof_path}`}
+                      src={a.photo_proof_path.startsWith("http") ? a.photo_proof_path : `/api/uploads/${a.photo_proof_path}`}
                       alt="Photo proof"
                       className="rounded-md max-h-48 object-cover border border-border"
                     />
